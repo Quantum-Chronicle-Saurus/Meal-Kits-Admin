@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Sidebar from "../components/Sidebar";
 
 const AddItems = () => {
   const [name, setName] = useState("");
@@ -25,10 +26,15 @@ const AddItems = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-100 to-gray-300">
+    <div className="flex h-screen bg-gradient-to-br from-gray-100 to-gray-300">
+    {/* Sidebar */}
+    <div className="w-[200px] bg-gray-200">
+      <Sidebar />
+    </div>
+    <div className="flex flex-1 items-center justify-center">
       <form
         onSubmit={handleSubmit}
-        className="bg-white shadow-lg rounded-lg p-8 w-full max-w-lg"
+        className="bg-white shadow-lg rounded-lg p-6 pt-10 pb-10 justify-center w-full max-w-lg min-h-[750px]"
       >
         <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
           Add New Item
@@ -113,6 +119,7 @@ const AddItems = () => {
         </button>
       </form>
     </div>
+  </div>
   );
 };
 

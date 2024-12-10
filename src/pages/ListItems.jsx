@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Sidebar from "../components/Sidebar";
 
 const ListItems = () => {
   // Mock data สำหรับสินค้า
@@ -65,7 +66,10 @@ const ListItems = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-6">
+    <div className="flex min-h-screen">
+      {/* Sidebar */}
+      <Sidebar />
+    <div className="container mx-auto px-4 py-6 bg-gray-100 ">
       <h2 className="text-2xl font-bold mb-4">List of Items</h2>
 
       {editingItem ? (
@@ -155,6 +159,7 @@ const ListItems = () => {
         </table>
       )}
     </div>
+  </div>
   );
 };
 

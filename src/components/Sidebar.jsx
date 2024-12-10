@@ -1,8 +1,11 @@
+import React from "react";
 import { NavLink } from "react-router-dom";
+
 
 const Sidebar = () => {
   return (
-    <nav className="flex flex-col gap-4  w-[150px] p-4 ">
+    <nav className="flex flex-col gap-4  w-[150px] sm:w-[500px] md:w-[150px]
+ p-4 ">
       <NavLink
         to="/add"
         className={({ isActive }) =>
