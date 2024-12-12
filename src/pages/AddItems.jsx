@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import Sidebar from "../components/Sidebar";
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
 
@@ -67,9 +68,12 @@ const AddItems = ({token}) => {
   };
 
   return (
-    
+      
       <div className="flex h-screen bg-gradient-to-br from-gray-100 to-gray-300">
-        <div className="flex flex-1 items-center justify-center px-4 sm:px-0">
+         {/* Sidebar */}
+      <Sidebar />
+      {/* Main Content */}
+        <div className="mt-10 flex-1 items-center justify-center px-4 sm:px-0">
           <form
             onSubmit={handleSubmit}
             className="bg-white shadow-lg rounded-lg p-6 pt-10 pb-10 w-full max-w-[90%] sm:max-w-[800px] min-h-[650px] mx-auto"
@@ -129,27 +133,38 @@ const AddItems = ({token}) => {
               {/* Category */}
               <div>
                 <label className="block text-gray-700 font-medium mb-1">Category</label>
-                <input
-                  type="text"
+                <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  placeholder="Enter category"
                   required
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-400 focus:outline-none"
-                />
+                  >
+                  <option value="" disabled>
+                  Select Category
+                  </option>
+                  <option value="boil">Boil</option>
+                  <option value="stir_fry">Stir Fry</option>
+                  <option value="curry">Curry</option>
+                  <option value="deep_fly">Deep Fry</option>
+                  <option value="salad">Salad</option>
+                  </select>
               </div>
               {/* Category Group */}
               <div>
                 <label className="block text-gray-700 font-medium mb-1">Category Group</label>
-                <input
-                  type="text"
+                <select
                   value={categoryGroup}
                   onChange={(e) => setCategoryGroup(e.target.value)}
-                  placeholder="Enter category group"
                   required
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-400 focus:outline-none"
-                />
-              </div>
+                  >
+                <option value="" disabled>
+                  Select Category Group
+                </option>
+                <option value="MealKits">MealKits</option>
+                <option value="PreparedAndReady">PreparedAndReady</option>
+                </select>
+                </div>
               {/* Ingredients */}
               <div>
                 <label className="block text-gray-700 font-medium mb-1">Ingredients</label>
