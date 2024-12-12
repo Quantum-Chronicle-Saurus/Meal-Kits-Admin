@@ -8,10 +8,15 @@ import Navbar from "./components/Navbar";
 import Login from "./components/Login";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useState } from "react";
+import { useState,useEffect } from "react";
 
 function App() {
-  const [token, setToken] = useState(null); // Track the login token
+  const [token, setToken] = useState(
+    localStorage.getItem("token") ? localStorage.getItem("token") : ""
+  );
+  useEffect(() => {
+    localStorage.setItem("token", token);
+  }, [token]);
 
   return (
     <Router>
@@ -24,11 +29,11 @@ function App() {
           {/* <Sidebar /> */}
           <div className="flex-grow p-4">
             <Routes>
-              <Route path="/loginAdmin" element={<Login />} />
+              <Route path="/loginAdmin" element={<Login setToken={setToken}/>} />
 
               <Route path="/" element={<Home />} />
 
-              <Route path="/add" element={<AddItems />} />
+              <Route path="/add" element={<AddItems token={token}/>} />
               <Route path="/list" element={<ListItems />} />
               <Route path="/orders" element={<Orders />} />
             </Routes>
