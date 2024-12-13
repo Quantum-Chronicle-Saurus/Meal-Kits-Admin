@@ -1,169 +1,94 @@
-import { useState } from "react";
-import Sidebar from "../components/Sidebar";
+import axios from "axios";
+import { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 
-const ListItems = () => {
-  // Mock data สำหรับสินค้า
-  const initialItems = [
-    {
-      id: 1,
-      name: "Product 1",
-      description: "Description of product 1",
-      price: 100,
-      image: "https://via.placeholder.com/150", // รูปภาพสำหรับสินค้า
-    },
-    {
-      id: 2,
-      name: "Product 2",
-      description: "Description of product 2",
-      price: 200,
-      image: "https://via.placeholder.com/150", // รูปภาพสำหรับสินค้า
-    },
-    {
-      id: 3,
-      name: "Product 3",
-      description: "Description of product 3",
-      price: 300,
-      image: "https://via.placeholder.com/150", // รูปภาพสำหรับสินค้า
-    },
-  ];
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
+export const currency = "฿";
 
-  const [items, setItems] = useState(initialItems);
-  const [editingItem, setEditingItem] = useState(null);
-  const [editedName, setEditedName] = useState("");
-  const [editedDescription, setEditedDescription] = useState("");
-  const [editedPrice, setEditedPrice] = useState("");
-  const [editedImage, setEditedImage] = useState(null);
+const ListItems = ({ token }) => {
+  const [list, setList] = useState([]);
 
-  // ฟังก์ชันแก้ไขข้อมูลสินค้า
-  const handleEdit = (item) => {
-    setEditingItem(item);
-    setEditedName(item.name);
-    setEditedDescription(item.description);
-    setEditedPrice(item.price);
-    setEditedImage(item.image);
+  const fetchList = async () => {
+    try {
+      const response = await axios.get(backendUrl + "/product/", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (response.data.success) {
+        setList(response.data.products.reverse());
+      } else {
+        toast.error(response.data.message);
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error(error.message);
+    }
   };
 
-  const handleSaveEdit = () => {
-    setItems((prevItems) =>
-      prevItems.map((item) =>
-        item.id === editingItem.id
-          ? {
-              ...item,
-              name: editedName,
-              description: editedDescription,
-              price: editedPrice,
-              image: editedImage,
-            }
-          : item
-      )
-    );
-    setEditingItem(null); // หยุดการแก้ไข
+  const removeProduct = async (id) => {
+    try {
+      const response = await axios.post(
+        backendUrl + "/product/remove",
+        { id },
+        { headers: { token } }
+      );
+
+      if (response.data.success) {
+        toast.success(response.data.message);
+        await fetchList();
+      } else {
+        toast.error(response.data.message);
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error(error.message);
+    }
   };
 
-  // ฟังก์ชันลบข้อมูลสินค้า
-  const handleDelete = (id) => {
-    setItems((prevItems) => prevItems.filter((item) => item.id !== id));
-  };
+  useEffect(() => {
+    fetchList();
+  }, []);
 
   return (
-    <div className="flex min-h-screen">
-      {/* Sidebar */}
-      <Sidebar />
-    <div className="container mx-auto px-4 py-6 bg-gray-100 ">
-      <h2 className="text-2xl font-bold mb-4">List of Items</h2>
+    <>
+      <p className="mb-2">All Products List</p>
+      <div className="flex flex-col gap-2">
+        {/* ------- List Table Title ---------- */}
 
-      {editingItem ? (
-        <div className="mb-4 p-4 border border-gray-300 rounded-lg">
-          <h3 className="text-xl font-semibold mb-4">Edit Product</h3>
-          <input
-            type="text"
-            value={editedName}
-            onChange={(e) => setEditedName(e.target.value)}
-            className="w-full px-3 py-2 mb-2 border border-gray-300 rounded-md"
-            placeholder="Product Name"
-          />
-          <textarea
-            value={editedDescription}
-            onChange={(e) => setEditedDescription(e.target.value)}
-            className="w-full px-3 py-2 mb-2 border border-gray-300 rounded-md"
-            placeholder="Product Description"
-          />
-          <input
-            type="number"
-            value={editedPrice}
-            onChange={(e) => setEditedPrice(e.target.value)}
-            className="w-full px-3 py-2 mb-2 border border-gray-300 rounded-md"
-            placeholder="Price"
-          />
-          <input
-            type="text"
-            value={editedImage}
-            onChange={(e) => setEditedImage(e.target.value)}
-            className="w-full px-3 py-2 mb-2 border border-gray-300 rounded-md"
-            placeholder="Image URL"
-          />
-          <button
-            onClick={handleSaveEdit}
-            className="px-4 py-2 bg-blue-500 text-white rounded-md"
-          >
-            Save Changes
-          </button>
-          <button
-            onClick={() => setEditingItem(null)}
-            className="ml-2 px-4 py-2 bg-gray-500 text-white rounded-md"
-          >
-            Cancel
-          </button>
+        <div className="hidden md:grid grid-cols-[1fr_2fr_1fr_1fr_1fr_1fr] items-center py-1 px-2 border bg-gray-100 text-sm">
+          <b>Image</b>
+          <b>Name</b>
+          <b>Main-category</b>
+          <b>Sub-category</b>
+          <b>Price</b>
+          <b className="text-center">Action</b>
         </div>
-      ) : (
-        <table className="w-full table-auto">
-          <thead>
-            <tr>
-              <th className="px-4 py-2 text-left">Image</th>
-              <th className="px-4 py-2 text-left">Name</th>
-              <th className="px-4 py-2 text-left">Description</th>
-              <th className="px-4 py-2 text-left">Price</th>
-              <th className="px-4 py-2 text-left">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {items.map((item) => (
-              <tr key={item.id}>
-                <td className="px-4 py-2">
-                  <img
-                    src={item.image}
-                    alt={item.name}
-                    className="w-16 h-16 object-cover"
-                  />
-                </td>
-                <td className="px-4 py-2">{item.name}</td>
-                <td className="px-4 py-2">{item.description}</td>
-                <td className="px-4 py-2">{item.price}</td>
-                <td className="px-4 py-2">
-                  <button
-                    onClick={() => handleEdit(item)}
-                    className="px-4 py-2 bg-yellow-400 text-white rounded-md mr-2"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(item.id)}
-                    className="px-4 py-2 bg-red-500 text-white rounded-md"
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
-    </div>
-  </div>
+
+        {/* ------ Product List ------ */}
+
+        {list.map((item, index) => (
+          <div
+            className="grid grid-cols-[1fr_3fr_1fr] md:grid-cols-[1fr_2fr_1fr_1fr_1fr_1fr] items-center gap-2 py-1 px-2 border text-sm"
+            key={index}
+          >
+            <img className="w-12" src={item.image[0]} alt="" />
+            <p>{item.name}</p>
+            <p>{item.categoryGroup}</p>
+            <p>{item.category}</p>
+            <p>
+              {currency}
+              {item.price}
+            </p>
+            <p
+              onClick={() => removeProduct(item._id)}
+              className="text-right md:text-center cursor-pointer text-lg"
+            >
+              X
+            </p>
+          </div>
+        ))}
+      </div>
+    </>
   );
 };
 
 export default ListItems;
-
-
-

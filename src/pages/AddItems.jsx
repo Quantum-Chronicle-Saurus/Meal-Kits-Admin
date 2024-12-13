@@ -4,8 +4,7 @@ import { toast } from "react-toastify";
 import Sidebar from "../components/Sidebar";
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
-
-const AddItems = ({token}) => { 
+const AddItems = ({ token }) => {
   console.log("AddItems component rendered");
   console.log(token);
   const [name, setName] = useState("");
@@ -18,7 +17,6 @@ const AddItems = ({token}) => {
   const [size, setSize] = useState("");
   const [nutrition, setNutrition] = useState("");
   const [image, setImage] = useState(null);
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -35,17 +33,11 @@ const AddItems = ({token}) => {
       if (image) {
         formData.append("image", image);
       }
-
-      const response = await axios.post(
-        backendUrl + "/product/add",
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          }
-        }
-      );
-
+      const response = await axios.post(backendUrl + "/product/add", formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       if (response.data.success) {
         toast.success(response.data.message);
         setName("");
@@ -66,9 +58,7 @@ const AddItems = ({token}) => {
       toast.error("Something went wrong!");
     }
   };
-
   return (
-      
       <div className="flex h-screen bg-gradient-to-br from-gray-100 to-gray-300">
          {/* Sidebar */}
       <Sidebar />
@@ -215,13 +205,77 @@ const AddItems = ({token}) => {
                 type="submit"
                 className="w-full mt-4 bg-blue-500 text-white py-3 rounded-lg shadow-lg hover:bg-blue-600 transition-all"
               >
-                Add Item
-              </button>
+                <option value="" disabled>
+                  Select Category Group
+                </option>
+                <option value="MealKits">MealKits</option>
+                <option value="PreparedAndReady">PreparedAndReady</option>
+              </select>
             </div>
-          </form>
-        </div>
+            {/* Ingredients */}
+            <div>
+              <label className="block text-gray-700 font-medium mb-1">
+                Ingredients
+              </label>
+              <input
+                type="text"
+                value={ingredients}
+                onChange={(e) => setIngredients(e.target.value)}
+                placeholder="Enter ingredients"
+                required
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-400 focus:outline-none"
+              />
+            </div>
+            {/* Size */}
+            <div>
+              <label className="block text-gray-700 font-medium mb-1">
+                Size
+              </label>
+              <input
+                type="text"
+                value={size}
+                onChange={(e) => setSize(e.target.value)}
+                placeholder="Enter size"
+                required
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-400 focus:outline-none"
+              />
+            </div>
+            {/* Nutrition */}
+            <div>
+              <label className="block text-gray-700 font-medium mb-1">
+                Nutrition
+              </label>
+              <input
+                type="text"
+                value={nutrition}
+                onChange={(e) => setNutrition(e.target.value)}
+                placeholder="Enter nutrition info"
+                required
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-400 focus:outline-none"
+              />
+            </div>
+            {/* Image */}
+            <div>
+              <label className="block text-gray-700 font-medium mb-1">
+                Image
+              </label>
+              <input
+                type="file"
+                onChange={(e) => setImage(e.target.files[0])}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-400 focus:outline-none"
+              />
+            </div>
+            {/* Submit Button */}
+            <button
+              type="submit"
+              className="w-full mt-4 bg-blue-500 text-white py-3 rounded-lg shadow-lg hover:bg-blue-600 transition-all"
+            >
+              Add Item
+            </button>
+          </div>
+        </form>
       </div>
-    );
-  };
-
+    </div>
+  );
+};
 export default AddItems;
