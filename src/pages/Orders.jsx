@@ -51,7 +51,7 @@ const Orders = () => {
   return (
     <div className="flex min-h-screen">
       {/* Sidebar */}
-      <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
+      {/* <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} /> */}
 
       {/* Main Content */}
       <div
