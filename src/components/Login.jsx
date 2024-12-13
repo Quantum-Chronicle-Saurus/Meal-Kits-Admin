@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
 // Backend URL (ควรใช้จาก environment variable ใน production)
-const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
 console.log(backendUrl);
 const Login = ({ setToken }) => {
   const [email, setEmail] = useState("");
@@ -32,12 +32,12 @@ const Login = ({ setToken }) => {
     } catch (error) {
       console.error("Login Error:", error);
 
-      // // แสดงข้อความ error
-      // if (error.response && error.response.data.message) {
-      //   toast.error(error.response.data.message);
-      // } else {
-      //   toast.error("An unexpected error occurred. Please try again.");
-      // }
+      // แสดงข้อความ error
+      if (error.response && error.response.data.message) {
+        toast.error(error.response.data.message);
+      } else {
+        toast.error("An unexpected error occurred. Please try again.");
+      }
     }
   };
 
