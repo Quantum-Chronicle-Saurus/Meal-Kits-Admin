@@ -22,6 +22,8 @@ const Login = ({ setToken }) => {
         password,
       });
 
+      console.log(response);
+      console.log(response.data);
       // ตรวจสอบ response และแสดงผล
       if (response.data.success) {
         toast.success("Login successful!"); // แจ้งเตือนเมื่อ login สำเร็จ
