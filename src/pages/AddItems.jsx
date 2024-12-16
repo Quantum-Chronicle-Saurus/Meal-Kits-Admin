@@ -4,8 +4,8 @@ import { toast } from "react-toastify";
 import Sidebar from "../components/Sidebar";
 const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
 const AddItems = ({ token }) => {
-  console.log("AddItems component rendered");
-  console.log(token);
+  // console.log("AddItems component rendered");
+  // console.log(token);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [longDescription, setLongDescription] = useState("");
@@ -100,7 +100,7 @@ const AddItems = ({ token }) => {
             {/* Long Description */}
             <div>
               <label className="block text-gray-700 font-medium mb-1">
-                คำอธิบายอาหาร 
+                คำอธิบายอาหาร
               </label>
               <input
                 type="text"
@@ -160,7 +160,7 @@ const AddItems = ({ token }) => {
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-400 focus:outline-none"
               >
                 <option value="" disabled>
-                 เลือกประเภทอาหาร
+                  เลือกประเภทอาหาร
                 </option>
                 <option value="MealKits">อาหารพร้อมปรุง</option>
                 <option value="PreparedAndReady">อาหารพร้อมทาน</option>
