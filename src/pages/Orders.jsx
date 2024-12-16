@@ -1,52 +1,96 @@
-import React, { useState } from "react";
-import Sidebar from "../components/Sidebar";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { toast } from "react-toastify";
+import moment from "moment";
 
-const Orders = () => {
-  const today = new Date().toISOString().slice(0, 10); // Current date in YYYY-MM-DD format
-  const [orders, setOrders] = useState([
-    {
-      id: 1,
-      productName: "Wireless Mouse",
-      productImage: "https://via.placeholder.com/100", // Mock image URL
-      customer: {
-        name: "John Doe",
-        address: "123 Main St, Springfield",
-        email: "john.doe@example.com",
-        phone: "123-456-7890",
-      },
-      quantity: 2,
-      date: today,
-      paymentMethod: "Credit Card",
-      price: 50.0,
-      status: "Pending",
-    },
-    {
-      id: 2,
-      productName: "Keyboard",
-      productImage: "https://via.placeholder.com/100", // Mock image URL
-      customer: {
-        name: "Jane Smith",
-        address: "456 Oak Lane, Metropolis",
-        email: "jane.smith@example.com",
-        phone: "987-654-3210",
-      },
-      quantity: 1,
-      date: today,
-      paymentMethod: "PayPal",
-      price: 75.0,
-      status: "Shipped",
-    },
-  ]);
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
+export const currency = "฿";
 
+const formatDate = (dateString) => {
+  return moment(dateString).format("DD/MM/YYYY HH:mm:ss");
+};
+
+const Orders = ({ token }) => {
+  const [orders, setOrders] = useState([]);
+  const [usernames, setUsernames] = useState({});
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  const updateStatus = (id, newStatus) => {
-    setOrders((prev) =>
-      prev.map((order) =>
-        order.id === id ? { ...order, status: newStatus } : order
-      )
-    );
+  // ฟังก์ชันดึงชื่อผู้ใช้ตาม userId
+  const fetchUserById = async (_id) => {
+    try {
+      console.log(_id);
+      const response = await axios.post(
+        backendUrl + "/admin/getUserById",
+        { _id },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      console.log(response.data);
+      return response.data.username; // return ชื่อผู้ใช้
+    } catch (error) {
+      console.log(error);
+      return "Unknown User"; // ในกรณีเกิดข้อผิดพลาด
+    }
   };
+
+  const fetchOrderList = async () => {
+    try {
+      const response = await axios.get(backendUrl + "/order/list", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (response.data.success) {
+        const orders = response.data.orders.reverse();
+        setOrders(orders);
+
+        // ดึงข้อมูล username สำหรับแต่ละ order
+        const usernamesMap = {};
+
+        for (const order of orders) {
+          if (order.userId) {
+            usernamesMap[order.userId] = await fetchUserById(order.userId);
+          }
+          console.log("usernameMap", usernamesMap);
+        }
+
+        setUsernames(usernamesMap); // เก็บชื่อผู้ใช้ใน state
+        console.log("usernameMap", usernames);
+      } else {
+        toast.error(response.data.message);
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error(error.message);
+    }
+  };
+
+  // const updateStatus = async (id, newStatus) => {
+  //   try {
+  //     const response = await axios.put(
+  //       `${backendUrl}/order/${id}/status`,
+  //       { status: newStatus },
+  //       { headers: { Authorization: `Bearer ${token}` } }
+  //     );
+  //     if (response.data.success) {
+  //       setOrders((prev) =>
+  //         prev.map((order) =>
+  //           order._id === id ? { ...order, status: newStatus } : order
+  //         )
+  //       );
+  //       toast.success("Status updated successfully!");
+  //     } else {
+  //       toast.error(response.data.message);
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //     toast.error(error.message);
+  //   }
+  // };
+
+  useEffect(() => {
+    fetchOrderList();
+  }, []);
 
   return (
     <div className="flex min-h-screen">
@@ -72,45 +116,58 @@ const Orders = () => {
           <table className="w-full bg-white border border-gray-300 rounded-lg ">
             <thead>
               <tr>
-                <th className="p-3 border-b-2 text-left min-w-[150px]">Product</th>
-                <th className="p-3 border-b-2 text-left min-w-[250px]">Customer Info</th>
-                <th className="p-3 border-b-2 text-center min-w-[100px]">Quantity</th>
-                <th className="p-3 border-b-2 text-center min-w-[150px]">Date</th>
-                <th className="p-3 border-b-2 text-left min-w-[150px]">Payment</th>
-                <th className="p-3 border-b-2 text-center min-w-[100px]">Price</th>
-                <th className="p-3 border-b-2 text-center min-w-[100px]">Status</th>
-                <th className="p-3 border-b-2 text-center min-w-[150px]">Actions</th>
+                <th className="p-3 border-b-2 text-center min-w-[25px]">#</th>
+                <th className="p-3 border-b-2 text-left min-w-[250px]">
+                  Customer Info
+                </th>
+                <th className="p-3 border-b-2 text-center min-w-[150px]">
+                  User
+                </th>
+                {/* <th className="p-3 border-b-2 text-center min-w-[100px]">
+                  Quantity
+                </th> */}
+                <th className="p-3 border-b-2 text-center min-w-[150px]">
+                  Date
+                </th>
+                <th className="p-3 border-b-2 text-left min-w-[150px]">
+                  Payment
+                </th>
+                <th className="p-3 border-b-2 text-center min-w-[100px]">
+                  Total Price
+                </th>
+                <th className="p-3 border-b-2 text-center min-w-[100px]">
+                  Status
+                </th>
+                <th className="p-3 border-b-2 text-center min-w-[150px]">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody>
-              {orders.map((order) => (
-                <tr key={order.id} className="hover:bg-gray-100">
-                  <td className="p-3 border-b flex items-center gap-3 ">
-                    <img
-                      src={order.productImage}
-                      alt={order.productName}
-                      className="w-35 h-35 border-b"
-                    />
-                    <p>{order.productName}</p>
+              {orders.map((order, index) => (
+                <tr key={order._id} className="hover:bg-gray-100">
+                  <td className="p-3  border-b text-right">
+                    <p>{index + 1}</p>
                   </td>
-                  <td className="p-3  border-b">
+                  <td className="p-3 border-b ">
                     <p>
-                      <strong>Name:</strong> {order.customer.name}
+                      <strong>Name:</strong> {order.name}
                     </p>
                     <p>
-                      <strong>Address:</strong> {order.customer.address}
-                    </p>
-                    <p>
-                      <strong>Email:</strong> {order.customer.email}
-                    </p>
-                    <p>
-                      <strong>Phone:</strong> {order.customer.phone}
+                      <strong>Address:</strong> {order.address}
                     </p>
                   </td>
-                  <td className="p-3 border-b text-center">{order.quantity}</td>
-                  <td className="p-3 border-b text-center">{order.date}</td>
+                  <td className="p-3 border-b text-center ">
+                    <p>{usernames[order.userId] || "Loading..."}</p>
+                  </td>
+                  {/* <td className="p-3 border-b text-center">{order.quantity}</td> */}
+                  <td className="p-3 border-b text-center">
+                    {formatDate(order.date)}
+                  </td>
                   <td className="p-3 border-b">{order.paymentMethod}</td>
-                  <td className="p-3 border-b text-center">${order.price.toFixed(2)}</td>
+                  <td className="p-3 border-b text-center">
+                    {order.totalPrice}
+                  </td>
                   <td className="p-3 border-b text-center">
                     <span
                       className={`px-3 py-1 rounded text-white ${
@@ -146,9 +203,3 @@ const Orders = () => {
 };
 
 export default Orders;
-
-
-
-
-
-

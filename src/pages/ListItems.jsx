@@ -65,21 +65,37 @@ const ListItems = ({ token }) => {
 
   const saveProduct = async (id) => {
     try {
+      if (
+        !editForm.name ||
+        !editForm.price ||
+        !editForm.category ||
+        !editForm.categoryGroup
+      ) {
+        toast.error("Please fill in all the fields.");
+        return;
+      }
+
       const formData = new FormData();
-      formData.append("id", editingProduct);
       formData.append("name", editForm.name);
       formData.append("price", editForm.price);
       formData.append("category", editForm.category);
       formData.append("categoryGroup", editForm.categoryGroup);
+
+      // ตรวจสอบว่า image ถูกเพิ่มไปใน FormData หรือไม่
       if (editForm.image) {
+        console.log("Image added to FormData:", editForm.image);
         formData.append("image", editForm.image);
       }
 
+      formData.append("id", id);
       const response = await axios.put(
         `${backendUrl}/product/${id}`,
         formData,
         {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
         }
       );
 
@@ -98,9 +114,11 @@ const ListItems = ({ token }) => {
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
-    if (file) {
+    if (file && file.type.startsWith("image/")) {
       setEditForm({ ...editForm, image: file });
       setPreviewImage(URL.createObjectURL(file));
+    } else {
+      toast.error("Please select a valid image file.");
     }
   };
 
@@ -184,7 +202,7 @@ const ListItems = ({ token }) => {
               </div>
               <div className="flex justify-center gap-2 items-center">
                 <button
-                  onClick={saveProduct}
+                  onClick={() => saveProduct(item._id)}
                   className="bg-green-500 text-white text-xs px-3 py-1 rounded-sm w-16"
                 >
                   Save

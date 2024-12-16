@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 // Backend URL (ควรใช้จาก environment variable ใน production)
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
-console.log(backendUrl);
+
 const Login = ({ setToken }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -16,11 +16,14 @@ const Login = ({ setToken }) => {
     e.preventDefault();
     try {
       // ส่ง request ไปยัง backend
+      console.log(backendUrl);
       const response = await axios.post(`${backendUrl}/admin/login`, {
         email,
         password,
       });
 
+      console.log(response);
+      console.log(response.data);
       // ตรวจสอบ response และแสดงผล
       if (response.data.success) {
         toast.success("Login successful!"); // แจ้งเตือนเมื่อ login สำเร็จ
