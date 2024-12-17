@@ -58,6 +58,22 @@ const Orders = ({ token }) => {
     }
   };
 
+  const updateStatus = async (orderId, e) => {
+    try {
+      const response = await axios.post(
+        backendUrl + "/order/status",
+        { orderId, status: e.target.value },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      if (response.data.success) {
+        await fetchOrderList(); // ใช้ฟังก์ชันนี้แทน fetchAllOrders
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error(error.message); // ควรใช้ error.message ไม่ใช่ response.data.message
+    }
+  };
+
   useEffect(() => {
     fetchOrderList();
   }, []);
@@ -98,8 +114,9 @@ const Orders = ({ token }) => {
       <select
         className="px-2 py-1 border border-gray-300 rounded"
         value={order.status}
-        onChange={(e) => updateStatus(order.id, e.target.value)}
+        onChange={(e) => updateStatus(order._id, e)}
       >
+        <option value="Order Placed">Order Placed</option>
         <option value="Pending">Pending</option>
         <option value="Shipped">Shipped</option>
         <option value="Canceled">Canceled</option>
